@@ -1,23 +1,25 @@
 'use strict'
-const nats = require('nats').connect()
+const NATS = require('nats')
 const mongoose = require('mongoose')
-
 const Vehicle = require('./src/models/vehicle-model')
 
-const options = {
-  useNewUrlParser: true
-}
+//Start connection with NATS
+const nc = NATS.connect({
+  url: "nats://localhost:4222",
+  json: true
+});
 
-mongoose.connect('mongodb://root:1234@localhost/vehicle?authSource=admin', options);
+//Start connection to mongoDB through mongoose
+mongoose.connect('mongodb://root:1234@localhost/vehicle?authSource=admin', {useNewUrlParser: true});
 
-
+//Mongoose ckecks for error when try to connect, if no errors the connection is open
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
   console.log('mongoDB connected!')
 
   //check for NATS error
-  nats.on('error', function(e) {
+  nc.on('error', function(e) {
     console.log('Error [' + nats.options.url + ']: ' + e)
     process.exit()
   })
@@ -26,51 +28,23 @@ db.once('open', function() {
   var subject = 'vehicle.test-bus-1'
 
   //subscribe with nats for a especific subject, in this case 'vehicle.test-bus-1' to receive data
-  nats.subscribe(subject, function(msg) {
-    //console.log(JSON.parse(msg));
-    const data = JSON.parse(msg)
-    //console.log(data.time)
+  nc.subscribe(subject, function(data) {
+    
+    //for each vehicle data, one instance of Vehicle Model is created
+    const vehicle = new Vehicle()
+    //for each attribute of Vehicle is asign a correspondent value from vehicle data
+    vehicle._id = new mongoose.Types.ObjectId(),
+    vehicle.time = data.time,
+    vehicle.energy = data.energy,
+    vehicle.gps = data.gps.split('|');
+    vehicle.odo =  data.odo,
+    vehicle.speed = data.speed,
+    vehicle.soc = data.soc
 
-  const vehicle = new Vehicle({
-    _id: new mongoose.Types.ObjectId(),
-    time: data.time,
-    energy: data.energy,
-    gps: [data.gps],
-    odo: data.odo,
-    speed: data.speed,
-    soc: data.soc
+    //vehicle is persisted on mongoDB
+    vehicle.save()
+    .then(result => console.log('vehicle data saved!',result))
+    .catch(error => console.log(error.message))
   })
-
-vehicle.save()
-.then(result => console.log('vehicle data saved!',result))
-.catch(error => console.log(error.message))
-
-
-
-
-  })
-
-
-
-
-
-/*const vehicle = new Vehicle({
-  _id: new mongoose.Types.ObjectId(),
-  time: 1511512585495,
-  energy: 85.14600000000002,
-  gps: ["52.08940124511719","5.105764865875244"],
-  odo: 5.381999999997788,
-  speed: 12,
-  soc: 88.00000000000007
-})
-
-vehicle.save()
-.then(result => console.log('vehicle data saved!',result))
-.catch(error => console.log(error.message))*/
-
-
-
-
-
 
 });
