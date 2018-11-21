@@ -4,13 +4,16 @@
   "description": "API to store data from nats to mongoDB and provide data to the client",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start-mongo": "sh ./start-mongo",
+    "start-data-storage": "node index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "express": "^4.16.4",
     "mongoose": "^5.3.12",
-    "nats": "^1.0.1"
+    "nats": "^1.0.1",
+    "ws": "^6.1.2"
   }
 }

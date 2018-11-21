@@ -2,6 +2,29 @@
 const NATS = require('nats')
 const mongoose = require('mongoose')
 const Vehicle = require('./src/models/vehicle-model')
+const express = require('express')
+const http = require('http')
+const WebSocket = require('ws')
+
+
+const app = express();
+
+app.get('/', (req,res) => {
+  res.send('response')
+})
+
+//initialize a simple http server
+const server = http.createServer(app);
+
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', function connection(ws) {
+  ws.on('close', function close() {
+    console.log('disconnected');
+  });
+});
+
+
 
 //Start connection with NATS
 const nc = NATS.connect({
@@ -48,8 +71,19 @@ db.once('open', function() {
     //mongoDB return a response which contain a object vehicle persisted,
     //then this object is provided to the client 
     vehicle.save()
-    .then(result => console.log('vehicle data saved!',result))
+    .then(result => {
+      wss.clients.forEach(function each(client) {
+        if (client.readyState === WebSocket.OPEN) {
+          client.send(JSON.stringify(result))
+        }
+      });
+    })
     .catch(error => console.log(error.message))
   })
 
+});
+
+//start our server
+server.listen(process.env.PORT || 8080, () => {
+  console.log(`Server started on port ${server.address().port} :)`);
 });
