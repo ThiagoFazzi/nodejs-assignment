@@ -18,22 +18,25 @@ db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function() {
   console.log('mongoDB connected!')
 
-  //check for NATS error
+  //mongoDB connection was open, then is time to ckeck for nats error
   nc.on('error', function(e) {
     console.log('Error [' + nats.options.url + ']: ' + e)
     process.exit()
   })
 
-  //Define NATS subject to looking for
-  var subject = 'vehicle.test-bus-1'
+  //Setup what subject you looking for in NATS server
+  const subject = 'vehicle.test-bus-1'
 
   //subscribe with nats for a especific subject, in this case 'vehicle.test-bus-1' to receive data
-  nc.subscribe(subject, function(data) {
+  nc.subscribe(subject, (data) => {
     
     //for each vehicle data, one instance of Vehicle Model is created
     const vehicle = new Vehicle()
-    //for each attribute of Vehicle is asign a correspondent value from vehicle data
+    //for each attribute of Vehicle model is 
+    //asign a correspondent value from vehicle data, 
+    //also subject that comes from a vehicle name
     vehicle._id = new mongoose.Types.ObjectId(),
+    vehicle.name = subject
     vehicle.time = data.time,
     vehicle.energy = data.energy,
     vehicle.gps = data.gps.split('|');
@@ -41,7 +44,9 @@ db.once('open', function() {
     vehicle.speed = data.speed,
     vehicle.soc = data.soc
 
-    //vehicle is persisted on mongoDB
+    //the vehicle try to persist on mongoDB, if it works, 
+    //mongoDB return a response which contain a object vehicle persisted,
+    //then this object is provided to the client 
     vehicle.save()
     .then(result => console.log('vehicle data saved!',result))
     .catch(error => console.log(error.message))

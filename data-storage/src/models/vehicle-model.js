@@ -2,6 +2,7 @@ const mongoose = require('mongoose')
 
 const vehicleSchema = mongoose.Schema({
     _id: mongoose.Types.ObjectId,
+    name: String,
     time: mongoose.Types.Decimal128,
     energy: mongoose.Types.Decimal128,
     gps:[String],
