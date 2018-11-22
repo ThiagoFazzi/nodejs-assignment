@@ -23,6 +23,7 @@ const NATS = require("nats")
 // After a connection is made you can start broadcasting messages (take a look at nats.publish())
 const nats = NATS.connect({json: true})
 
+
 // This function will start reading out csv data from file and publish it on nats
 const readOutLoud = (vehicleName) => {
 	// Read out meta/route.csv and turn it into readable stream
@@ -81,3 +82,4 @@ readOutLoud("test-bus-1")
 		console.log("henk is on the last stop and he is taking a cigarrete while waiting for his next trip")
 	})
 // To make your presentation interesting maybe you can make henk drive again in reverse
+
