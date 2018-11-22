@@ -5,7 +5,7 @@ const mongoose = require('mongoose')
 const VehicleModel = require('./src/models/vehicle-model')
 const express = require('express')
 const http = require('http')
-const WebSocket = require('ws')
+const socketIo = require('socket.io')
 const Vehicle = require('./src/routers/vehicle')
 
 //create instance of express
@@ -15,7 +15,7 @@ const app = express();
 const server = http.createServer(app);
 
 //create intance of websocket server
-const wss = new WebSocket.Server({ server });
+const io = socketIo(server); // < Interesting!
 
 //Rest API 
 app.use('/vehicle', Vehicle)
@@ -24,14 +24,14 @@ app.use('/vehicle', Vehicle)
 mongoose.connect('mongodb://'+ process.env.MONGODB_USERNAME + ':' + process.env.MONGODB_PASSWORD + '@localhost/vehicle?authSource=admin', {useNewUrlParser: true});
 
 //listen for clients connection events througt websockets
-wss.on('connection', function connection(ws) {
-  console.log('connected')
-
-  //listen for clients close connection event
-  ws.on('close', function close() {
-    console.log('disconnected');
-  });
+const socket = io.on("connection", socket => {
+  console.log("New client connected")
+  return socket
+  
+  //socket.on("disconnect", () => console.log("Client disconnected"));
 });
+
+
 
 
 
@@ -82,11 +82,13 @@ db.once('open', function() {
     //then this object is provided to the client 
     vehicle.save()
     .then(result => {
-      wss.clients.forEach(function each(client) {
-        if (client.readyState === WebSocket.OPEN) {
-          client.send(JSON.stringify(result))
-        }
-      });
+
+      socket.emit("Vehicle", result)
+      //wss.clients.forEach(function each(client) {
+      //  if (client.readyState === WebSocket.OPEN) {
+      //    client.send(JSON.stringify(result))
+      //  }
+      //});
     })
     .catch(error => console.log('mongoDB error:',error.message))
   })
