@@ -91,8 +91,8 @@ db.once('open', function() {
       //});
     })
     .catch(error => console.log('mongoDB error:',error.message))
-  })
 
+  })
 });
 
 //start our server
