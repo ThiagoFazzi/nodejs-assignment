@@ -1,0 +1,25 @@
+version: '3'
+services:
+    data-storage:
+        image: thiago/data-storage
+        container_name: data-storage
+        depends_on:
+        - mongo-vehicle
+        - nats
+        ports: 
+        - 8080:8080
+    mongo-vehicle:
+        image: mongo
+        ports: 
+        - 27017:27017
+        container_name: mongo-vehicle
+        environment:
+        - MONGO_INITDB_ROOT_USERNAME=user
+        - MONGO_INITDB_ROOT_PASSWORD=password
+        - MONGO_INITDB_DATABASE=database
+        command: --auth
+    nats:
+        image: nats
+        container_name: nats
+        ports:
+        - 4222:4222

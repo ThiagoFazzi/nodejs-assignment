@@ -4,18 +4,25 @@
   "description": "API to store data from nats to mongoDB and provide data to the client",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node src/test.js",
     "start-mongo": "sh ./start-mongo",
-    "start-data-storage": "node index.js"
+    "start-data-storage-docker": "sh ./start-data-storage",
+    "start-data-storage": "node src/index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.18.3",
+    "cors": "^2.8.5",
     "dotenv": "^6.1.0",
     "express": "^4.16.4",
     "mongoose": "^5.3.12",
     "nats": "^1.0.1",
     "socket.io": "^2.1.1",
     "ws": "^6.1.2"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-http": "^2.0.1",
   }
 }

@@ -3,12 +3,12 @@ const mongoose = require('mongoose')
 const vehicleSchema = mongoose.Schema({
     _id: mongoose.Types.ObjectId,
     name: String,
-    time: mongoose.Types.Decimal128,
-    energy: mongoose.Types.Decimal128,
+    time: Number,
+    energy: String,
     gps:[String],
-    odo: mongoose.Types.Decimal128,
+    odo: String,
     speed: Number,
-    soc: mongoose.Types.Decimal128
+    soc: String
 })
 
 module.exports = mongoose.model("vehicle", vehicleSchema)

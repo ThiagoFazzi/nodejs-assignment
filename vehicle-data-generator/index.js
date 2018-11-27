@@ -43,14 +43,16 @@ const readOutLoud = (vehicleName) => {
 	//
 
 	let i = 0
-
+	//console.log(fileStream)
 	return (fileStream
 		// Filestream piped to csvParse which accept nodejs readablestreams and parses each line to a JSON object
 		.pipe(csvParse({ delimiter: ",", columns: true, cast: true }))
+		
 		// Then it is piped to a writable streams that will push it into nats
 		.pipe(new Writable({
 			objectMode: true,
 			write(obj, enc, cb) {
+				
 				// setTimeout in this case is there to emulate real life situation
 				// data that came out of the vehicle came in with irregular interval
 				// Hence the Math.random() on the second parameter
@@ -64,6 +66,7 @@ const readOutLoud = (vehicleName) => {
 					// it also includes the vehicle name to seggregate data between different vehicle
 
 					nats.publish(`vehicle.${vehicleName}`, obj, cb)
+					
 
 				}, Math.ceil(Math.random() * 150))
 			}
@@ -81,5 +84,7 @@ readOutLoud("test-bus-1")
 	.once("finish", () => {
 		console.log("henk is on the last stop and he is taking a cigarrete while waiting for his next trip")
 	})
+
+
 // To make your presentation interesting maybe you can make henk drive again in reverse
 

@@ -1,7 +1,9 @@
 import React, { Component } from 'react'
-import GaugeComponent from './gauge-component';
-import io from "socket.io-client";
-import { Map, GoogleApiWrapper, Marker } from 'google-maps-react';
+import GaugeComponent from './gauge-component'
+import io from "socket.io-client"
+import { Map, GoogleApiWrapper, Marker } from 'google-maps-react'
+import axios from 'axios'
+import ListComponent from './list-component';
 
 const styles = {
   map:{
@@ -10,10 +12,22 @@ const styles = {
     height: '300px',
   },
   chart: {
-    width: '40%',
+    width: '30%',
     margin: '300px 0px 0px 10%',
     position: 'absolute',
-    display: 'inline-box'
+    display: 'inline-box',
+    height: '250px',
+    border: '1px solid black'
+  },
+  log: {
+    width: '50%',
+    height: '250px',
+    margin: '300px 0px 0px 40%',
+    position: 'absolute',
+    display: 'inline-box',
+    overflow: 'auto',
+    fontSize: '.8em',
+    border: '1px solid black'
   },
   ledOn: {
     border: '1px solid #c2c2c2',
@@ -41,10 +55,13 @@ class MainComponent extends Component {
       speed: 0,
       soc: 0,
       energy: 0,
+      odo: 0,
       lat: 0,
       lng: 0,
       zoom: 2,
       online: false,
+      logs: [],
+      limit: 5
     }
   }
 
@@ -61,17 +78,32 @@ class MainComponent extends Component {
     .on("Vehicle", data => {
       this.setState({
         speed: data.speed,
-        soc: data.soc.$numberDecimal,
-        energy: data.energy.$numberDecimal,
+        soc: data.soc,
+        energy: data.energy,
         lat: data.gps[0],
         lng: data.gps[1],
+        odo: data.odo,
         zoom: 16,
         sending: true,
       })
     })
+
+    this.handleLog('vehicle.test-bus-1', this.state.limit)
   }
 
+  handleChangeLimit = (e) => {
+    this.setState({limit: e.target.value})
+  }
 
+  handleLog = (vehicle, limit) => {
+    axios.get(`http://localhost:8080/vehicle/${vehicle}/limit/${limit}`)
+    .then(response => {
+      this.setState({logs: response.data});
+    })
+    .catch(function (error) {
+      console.log(error);
+    })
+  }
 
   render() {
     return (
@@ -95,39 +127,49 @@ class MainComponent extends Component {
           />
         </Map>
         <div style={styles.chart}>
-        <GaugeComponent
-          color="green"
-          strokeWidth="15"
-          sqSize="80"
-          percentage={this.state.speed}
-          label={'km/h'}
-          title={'Speed'}
-        />
-        <GaugeComponent
-          color="blue"
-          strokeWidth="15"
-          sqSize="80"
-          percentage={this.state.soc}
-          label={'%'}
-          title={'SOC'}
-        />
-        <GaugeComponent
-          color="red"
-          strokeWidth="15"
-          sqSize="80"
-          percentage={this.state.energy}
-          label={'kw/h'}
-          title={'Energy'}
-        />
-        <div style={(this.state.online)? styles.ledOn : styles.ledOff }></div>
+          <GaugeComponent
+            color="green"
+            strokeWidth="15"
+            sqSize="80"
+            percentage={this.state.speed}
+            label={'km/h'}
+            title={'Speed'}
+          />
+          <GaugeComponent
+            color="blue"
+            strokeWidth="15"
+            sqSize="80"
+            percentage={this.state.soc}
+            label={'%'}
+            title={'SOC'}
+          />
+          <GaugeComponent
+            color="red"
+            strokeWidth="15"
+            sqSize="80"
+            percentage={this.state.energy}
+            label={'kw/h'}
+            title={'Energy'}
+          />
+          <div>
+            Online: <div style={(this.state.online)? styles.ledOn : styles.ledOff }></div>
+          </div>
+          <div>
+            Log size: <input type="number" value={this.state.limit} onChange={(e)=>{ this.handleChangeLimit(e) }} min="1" max="50"></input>
+            <button onClick={()=> this.handleLog('vehicle.test-bus-1', this.state.limit)}>Refresh</button>
+          </div>
+          <div>
+            <h5>{`Distance: ${this.state.odo} Km`}</h5>
+          </div>
         </div>
-
+        <div style={styles.log}>
+        <ListComponent list={this.state.logs} />
+        </div>
       </div>
     )
   }
 }
 
 export default GoogleApiWrapper({
-  apiKey: 'AIzaSyA1hygOKnk5N5aJ3-oHHzYQ-031Ug-OP_U'
+  apiKey: process.env.REACT_APP_MAPS_KEY
 })(MainComponent);
-
