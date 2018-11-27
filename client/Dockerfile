@@ -10,10 +10,10 @@ ENV PATH /usr/src/app/node_modules/.bin:$PATH
 
 # install and cache app dependencies
 COPY package.json /usr/src/app/package.json
+COPY .env /usr/src/app/.env
 RUN npm install --silent
 RUN npm install react-scripts@1.1.1 -g --silent
 
-ENV MAPS_KEY=YOUR_GOOGLE_KEY
 
 # start app
 CMD ["npm", "start"]
