@@ -7,7 +7,7 @@
     "test": "node src/test.js",
     "start-mongo": "sh ./start-mongo",
     "start-data-storage-docker": "sh ./start-data-storage",
-    "start-data-storage": "node src/index.js"
+    "start": "node src/index.js"
   },
   "author": "",
   "license": "ISC",
@@ -23,6 +23,6 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
-    "chai-http": "^2.0.1",
+    "chai-http": "^2.0.1"
   }
 }

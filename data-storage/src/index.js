@@ -30,7 +30,8 @@ socket.on('disconnect', () => {
   console.log('Client disconnected')
 })
 
-mongoose.connect('mongodb://'+ process.env.MONGO_USER +':'+ process.env.MONGO_PW +'@mongo-vehicle/vehicle?authSource=admin', {useNewUrlParser: true});
+//mongoose.connect(`mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@mongo-vehicle/vehicle?authSource=admin`, {useNewUrlParser: true});
+mongoose.connect('mongodb://mongo-vehicle/vehicle', {useNewUrlParser: true});
 const db = mongoose.connection
 db
 .on('error', () => {
