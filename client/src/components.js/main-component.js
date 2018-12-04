@@ -3,49 +3,82 @@ import GaugeComponent from './gauge-component'
 import io from "socket.io-client"
 import { Map, GoogleApiWrapper, Marker } from 'google-maps-react'
 import axios from 'axios'
-import ListComponent from './list-component';
+import ListComponent from './list-component'
+import HeaderComponent from './header-component'
+import FooterComponent from './footer-component'
+import DetailComponent from './detail-component';
+
+
 
 const styles = {
+  background: {
+    backgroundColor: 'green',
+    width: '100%',
+    height: 'auto',
+    top: '105px',
+    position: 'fixed'
+  },
   map:{
-    margin: '0 auto',
-    width: '80%',
-    height: '300px',
+    margin: '30px 2% 30px 5%',
+    width: '43%',
+    height: '400px',
+    position: 'relative',
+    display: 'inline-block',
+    borderRadius: '20px',
   },
   chart: {
-    width: '30%',
-    margin: '300px 0px 0px 10%',
-    position: 'absolute',
-    display: 'inline-box',
-    height: '250px',
-    border: '1px solid black'
-  },
-  log: {
-    width: '50%',
-    height: '250px',
-    margin: '300px 0px 0px 40%',
-    position: 'absolute',
-    display: 'inline-box',
-    overflow: 'auto',
-    fontSize: '.8em',
-    border: '1px solid black'
-  },
-  ledOn: {
-    border: '1px solid #c2c2c2',
-    borderRadius: '50%',
-    width: '20px',
-    height: '20px',
-    backgroundColor: 'lime',
-    display: 'inline-block'
-  },
-  ledOff: {
+    width: '43%',
+    margin: '30px 5% 7px 50%',
+    position: 'relative',
     display: 'inline-block',
-    backgroundColor: 'red',
-    border: '1px solid #c2c2c2',
-    borderRadius: '50%',
-    width: '20px',
-    height: '20px'
+    height: 'auto',
+    borderRadius: '20px',
+    border: '2px solid white',
+    backgroundColor: 'green',
+    padding: '10px'
+  },
+  details: {
+    width: '43%',
+    margin: '15px 5% 20px 50%',
+    position: 'relative',
+    display: 'inline-block',
+    height: '150px',
+    borderRadius: '20px',
+    backgroundColor: '#c2c2c2',
+    padding: '10px'
+  },
+  logButton: {
+    position: 'absolute',
+    bottom: '15px',
+    right: '40px',
+  },
+  logList: {
+    backgroundColor: 'white',
+    color: 'black',
+    width: '100%',
+    height: '255px',
+    overflow: 'auto',
+    position:  'relative',
+    fontSize: '1.2em',
+    marginTop: '15px',
+    zIndex: 3
+  },
+  logScreen: {
+    paddingTop: '10px',
+    paddingLeft: '10px',
+    paddingRight: '10px',
+    bottom: '0px',
+    color: 'white',
+    width: '94%',
+    height: '300px',
+    margin: '0px 3% 0px 3%',
+    position: 'absolute',
+    backgroundColor: 'black',
+    border: '1px solid black',
+    borderRadius: '15px 15px 0 0',
+    transition: 'bottom 2s easy',
+    zIndex: 2,
   }
-  //position: 'absolute'
 };
 
 class MainComponent extends Component {
@@ -60,6 +93,7 @@ class MainComponent extends Component {
       lng: 0,
       zoom: 2,
       online: false,
+      logOpen: false,
       logs: [],
       limit: 5,
       incident: ''
@@ -84,7 +118,7 @@ class MainComponent extends Component {
         lat: data.gps[0],
         lng: data.gps[1],
         odo: data.odo,
-        zoom: 16,
+        zoom: 17,
         sending: true,
       })
     })
@@ -93,6 +127,10 @@ class MainComponent extends Component {
     })
 
     this.handleLog('test-bus-1', this.state.limit)
+  }
+
+  handleLogScreen = (e) => {
+    (this.state.logOpen) ? this.setState({logOpen: false}) : this.setState({logOpen: true})
   }
 
   handleChangeLimit = (e) => {
@@ -112,65 +150,68 @@ class MainComponent extends Component {
   render() {
     return (
       <div>
-        <Map
-          google={this.props.google}
-          zoom={this.state.zoom}
-          style={styles.map}
-          initialCenter={{
-            lat: `${this.state.lat}`,
-            lng: `${this.state.lng}`
-          }}
-          center={{
-            lat: `${this.state.lat}`,
-            lng: `${this.state.lng}`
-          }}
-        >
-          <Marker
-            name={'Your position'}
-            position={{lat: `${this.state.lat}`, lng:  `${this.state.lng}`}}
-          />
-        </Map>
-        <div style={styles.chart}>
-          <GaugeComponent
-            color="green"
-            strokeWidth="15"
-            sqSize="80"
-            percentage={this.state.speed}
-            label={'km/h'}
-            title={'Speed'}
-          />
-          <GaugeComponent
-            color="blue"
-            strokeWidth="15"
-            sqSize="80"
-            percentage={this.state.soc}
-            label={'%'}
-            title={'SOC'}
-          />
-          <GaugeComponent
-            color="red"
-            strokeWidth="15"
-            sqSize="80"
-            percentage={this.state.energy}
-            label={'kw/h'}
-            title={'Energy'}
-          />
-          <div>
-            Online: <div style={(this.state.online)? styles.ledOn : styles.ledOff }></div>
+        <HeaderComponent />
+        <div style={styles.background}>
+          <Map
+            google={this.props.google}
+            zoom={this.state.zoom}
+            style={styles.map}
+            initialCenter={{
+              lat: `${this.state.lat}`,
+              lng: `${this.state.lng}`
+            }}
+            center={{
+              lat: `${this.state.lat}`,
+              lng: `${this.state.lng}`
+            }}
+          >
+            <Marker
+              name={'Your position'}
+              position={{lat: `${this.state.lat}`, lng:  `${this.state.lng}`}}
+            />
+          </Map>
+          <div style={styles.chart}>
+            <GaugeComponent
+              color="lime"
+              strokeWidth="15"
+              sqSize="120"
+              percentage={this.state.speed}
+              label={'km/h'}
+              title={'Speed'}
+            />
+            <GaugeComponent
+              color="blue"
+              strokeWidth="15"
+              sqSize="120"
+              percentage={this.state.soc}
+              label={'%'}
+              title={'SOC'}
+            />
+            <GaugeComponent
+              color="red"
+              strokeWidth="15"
+              sqSize="120"
+              percentage={this.state.energy}
+              label={'kw/h'}
+              title={'Energy'}
+            />
           </div>
-          <div>
-            Log size: <input type="number" value={this.state.limit} onChange={(e)=>{ this.handleChangeLimit(e) }} min="1" max="50"></input>
-            <button onClick={()=> this.handleLog('test-bus-1', this.state.limit)}>Refresh</button>
-          </div>
-          <div>
-            <h5>{`Distance: ${this.state.odo} Km`}</h5>
-          </div>
-          <div>
-            <h5>{`Incident: ${this.state.incident}`}</h5>
+          <div style={styles.details}>
+              <DetailComponent online={this.state.online} distance={this.state.odo} incident={this.state.incident}/>
           </div>
         </div>
-        <div style={styles.log}>
-        <ListComponent list={this.state.logs} />
+        <FooterComponent/>
+        { this.state.logOpen &&
+          <div style={styles.logScreen}>
+            Log size: <input type="number" value={this.state.limit} onChange={(e)=>{ this.handleChangeLimit(e) }} min="1" max="50"></input>
+            <button onClick={()=> this.handleLog('test-bus-1', this.state.limit)}>Refresh</button>
+            <div style={styles.logList} onClick={this.handleLogScreen}>
+              <ListComponent list={this.state.logs} />
+            </div>
+          </div>
+        }
+        <div style={styles.logButton}>
+          <button onClick={this.handleLogScreen}>Logs</button>
         </div>
       </div>
     )

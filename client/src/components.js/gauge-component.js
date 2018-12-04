@@ -26,15 +26,16 @@ const GaugeComponent = ({percentage, strokeWidth, sqSize, color, label, title}) 
     circleText: {
       fontSize: `${sqSizeT * 0.010}em`,
       fontWeight: 'bold',
-      fill: `${color}`,
+      fill: 'white',
     },
     control: {
-      margin: '10px',
+      margin: '10px 35px 10px 35px',
       display: 'inline-block',
-      textAlign: 'center'
+      textAlign: 'center',
+      color: 'white'
     },
     title: {
-      color: `${color}`,
+      color: 'white',
       fontSize: `${sqSizeT * 0.015}em`,
       fontWeight: 'bold',
     }

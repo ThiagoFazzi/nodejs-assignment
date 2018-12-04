@@ -3,6 +3,8 @@ import React from 'react'
 const styles = {
   cell:{
     textAlign: 'center',
+    paddingLeft: '20px',
+    paddingRight: '30px'
   },
   tableHead: {
     position: 'fixed'
@@ -13,8 +15,7 @@ const styles = {
 
 const ListComponent = ({ list }) => {
   if(!list.vehicles) return <p>Loading</p>
-  return(
-    <div>
+  return(    <div>
       <table>
         <thead>
           <tr>
@@ -31,8 +32,8 @@ const ListComponent = ({ list }) => {
         <tbody>
         {list.vehicles.map(item => 
           <tr key={item._id}>
-            <td>{item.name}</td>
-            <td>{item.time}</td>
+            <td style={styles.cell}>{item.name}</td>
+            <td style={styles.cell}>{item.time}</td>
             <td style={styles.cell}>{item.speed}</td>
             <td style={styles.cell}>{item.gps[0]}</td>
             <td style={styles.cell}>{item.gps[1]}</td>
