@@ -61,7 +61,8 @@ class MainComponent extends Component {
       zoom: 2,
       online: false,
       logs: [],
-      limit: 5
+      limit: 5,
+      incident: ''
     }
   }
 
@@ -87,8 +88,11 @@ class MainComponent extends Component {
         sending: true,
       })
     })
+    .on('Error', data => {
+      this.setState({incident: data.msg})
+    })
 
-    this.handleLog('vehicle.test-bus-1', this.state.limit)
+    this.handleLog('test-bus-1', this.state.limit)
   }
 
   handleChangeLimit = (e) => {
@@ -156,10 +160,13 @@ class MainComponent extends Component {
           </div>
           <div>
             Log size: <input type="number" value={this.state.limit} onChange={(e)=>{ this.handleChangeLimit(e) }} min="1" max="50"></input>
-            <button onClick={()=> this.handleLog('vehicle.test-bus-1', this.state.limit)}>Refresh</button>
+            <button onClick={()=> this.handleLog('test-bus-1', this.state.limit)}>Refresh</button>
           </div>
           <div>
             <h5>{`Distance: ${this.state.odo} Km`}</h5>
+          </div>
+          <div>
+            <h5>{`Incident: ${this.state.incident}`}</h5>
           </div>
         </div>
         <div style={styles.log}>

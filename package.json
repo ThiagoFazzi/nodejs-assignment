@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "csv-parse": "^3.2.0",
+    "csv-stringify": "^5.0.0",
     "nats": "^1.0.1"
   }
 }

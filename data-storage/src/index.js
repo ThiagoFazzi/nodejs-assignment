@@ -30,8 +30,7 @@ socket.on('disconnect', () => {
   console.log('Client disconnected')
 })
 
-//mongoose.connect(`mongodb://${process.env.MONGO_INITDB_ROOT_USERNAME}:${process.env.MONGO_INITDB_ROOT_PASSWORD}@mongo-vehicle/vehicle?authSource=admin`, {useNewUrlParser: true});
-mongoose.connect('mongodb://mongo-vehicle/vehicle', {useNewUrlParser: true});
+mongoose.connect('mongodb://mongo-data-storage/vehicle', {useNewUrlParser: true});
 const db = mongoose.connection
 db
 .on('error', () => {
@@ -43,28 +42,40 @@ const nc = NATS.connect({
   json: true
 });
 
-const subject = 'vehicle.test-bus-1'
-
 nc
 .on('error', function(e) {
   console.log('Error', e)
   process.exit()
 })
-.subscribe(subject, (data) => {
 
-  const vehicle = new VehicleModel()
-  vehicle._id = new mongoose.Types.ObjectId(),
-  vehicle.name = subject
-  vehicle.time = data.time,
-  vehicle.energy = data.energy,
-  vehicle.gps = data.gps.split('|');
-  vehicle.odo =  data.odo,
-  vehicle.speed = data.speed,
-  vehicle.soc = data.soc
+.subscribe('vehicle.*.test-bus-1', function(data, reply, subject) {
 
-  vehicle.save()
-  .then(result => socket.emit("Vehicle", result))
-  .catch(error => console.log('mongoDB error:',error.message))
+  switch (subject) {
+    case 'vehicle.done.test-bus-1':
+      const vehicle = new VehicleModel()
+      vehicle._id = new mongoose.Types.ObjectId(),
+      vehicle.name = subject.split('.')[2]
+      vehicle.time = data.time,
+      vehicle.energy = data.energy,
+      vehicle.gps = data.gps.split('|');
+      vehicle.odo =  data.odo,
+      vehicle.speed = data.speed,
+      vehicle.soc = data.soc
+
+      vehicle.save()
+      .then(vehicle => {
+        socket.emit("Vehicle", vehicle)
+        console.log(vehicle)
+      })
+      .catch(error => console.log('mongoDB error:',error))
+      break
+
+    case 'vehicle.error.test-bus-1':
+      socket.emit("Error", data)
+      break
+      
+    default:
+  }
 })
 
 server.listen(8080, () => {
