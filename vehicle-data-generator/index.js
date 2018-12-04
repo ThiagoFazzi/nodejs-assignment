@@ -148,20 +148,22 @@ readOutLoud('test-bus-1')
 		}
 		nats.publish('vehicle.error.test-bus-1', obj)
 		console.log('henk is on the last stop and he is taking a cigarrete while waiting for his next trip')
-		Promise.resolve(reversePath())
-			.then(_ => {
-				readOutLoudBack('test-bus-1')
-					.once('finish', () => {
-						const obj = {
-							time: 1511436338000,
-							gps: '52.093448638916016|5.117378234863281',
-							msg: 'henk arrives to the destination'
-						}
-						nats.publish('vehicle.error.test-bus-1', obj)
-						console.log('henk arrives to the destination')
-				})
-			}
-		)
+		setTimeout(() => {
+			Promise.resolve(reversePath())
+				.then(_ => {
+					readOutLoudBack('test-bus-1')
+						.once('finish', () => {
+							const obj = {
+								time: 1511436338000,
+								gps: '52.093448638916016|5.117378234863281',
+								msg: 'henk arrives to the destination'
+							}
+							nats.publish('vehicle.error.test-bus-1', obj)
+							console.log('henk arrives to the destination')
+					})
+				}
+			)
+		}, 6000);
 	})
 
 
