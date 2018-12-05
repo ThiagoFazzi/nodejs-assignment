@@ -30,7 +30,7 @@ const DetailComponent = ({online , distance, incident}) => {
     <div>
       <div style={styles.online}>
         <div style={(online)? styles.On : styles.Off }>
-          Online
+          {(online)? 'Online' : 'Offline'}
         </div>
         
       </div>

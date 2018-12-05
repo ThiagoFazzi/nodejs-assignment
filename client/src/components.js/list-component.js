@@ -33,7 +33,7 @@ const ListComponent = ({ list }) => {
         {list.vehicles.map(item => 
           <tr key={item._id}>
             <td style={styles.cell}>{item.name}</td>
-            <td style={styles.cell}>{item.time}</td>
+            <td style={styles.cell}>{new Date(item.time).toLocaleString('de-DE',{hour12: false})}</td>
             <td style={styles.cell}>{item.speed}</td>
             <td style={styles.cell}>{item.gps[0]}</td>
             <td style={styles.cell}>{item.gps[1]}</td>

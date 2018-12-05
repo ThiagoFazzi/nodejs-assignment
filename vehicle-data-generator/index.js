@@ -105,7 +105,7 @@ const reversePath = () => {
 		speed: 'speed',
 		soc: 'soc',
 	}
-	array.map(item => backArray.push([item.time,item.energy,item.gps,item.odo,item.speed,item.soc]))
+	array.map((item, i) => backArray.push([item.time,item.energy,item.gps,item.odo,item.speed,item.soc]))
 
 	csvStringify(backArray, { header: true, columns: columns }, (err, output) => {
 		if (err) throw err
