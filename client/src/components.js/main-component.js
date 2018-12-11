@@ -96,7 +96,10 @@ class MainComponent extends Component {
       logOpen: false,
       logs: [],
       limit: 5,
-      incident: ''
+      incident: {
+        time: '',
+        msg:''
+      }
     }
   }
 
@@ -123,7 +126,7 @@ class MainComponent extends Component {
       })
     })
     .on('Error', data => {
-      this.setState({incident: data.msg})
+      this.setState({incident: {time: data.time, msg: data.msg}})
     })
 
     this.handleLog('test-bus-1', this.state.limit)

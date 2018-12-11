@@ -27,6 +27,7 @@ const DetailComponent = ({online , distance, incident}) => {
   }
 
   return(
+    
     <div>
       <div style={styles.online}>
         <div style={(online)? styles.On : styles.Off }>
@@ -40,7 +41,9 @@ const DetailComponent = ({online , distance, incident}) => {
       </div>
       <div style={styles.incident}>
         <div>Incident:</div>
-        <div>{`${incident}`}</div>
+          {
+           incident.time && <div>{`${new Date(incident.time).toLocaleString('de-DE', {hour12: true})} - ${incident.msg}`}</div>
+          }
       </div>
     </div>
   )
