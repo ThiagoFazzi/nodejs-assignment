@@ -42,6 +42,10 @@ const nc = NATS.connect({
   json: true
 });
 
+a = {
+  b: 1
+}
+
 nc
 .on('error', function(e) {
   console.log('Error', e)
